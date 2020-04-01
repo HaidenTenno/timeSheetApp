@@ -10,15 +10,19 @@ import UIKit
 import AVFoundation
 import SnapKit
 
-class ViewController: UIViewController {
+class ScannerViewController: UIViewController {
     
     // UI
     
     // Services
     private var scanner: Scanner?
     
+    // Callbacks
+    private let onBarcodeDetected: (String) -> Void
+    
     // Public
-    init() {
+    init(onBarcodeDetected: @escaping (String) -> Void) {
+        self.onBarcodeDetected = onBarcodeDetected
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -36,10 +40,10 @@ class ViewController: UIViewController {
 }
 
 // MARK: - Private
-private extension ViewController {
+private extension ScannerViewController {
     
     private func setupScanner() {
-        self.scanner = Scanner(viewController: self, view: view, codeOutputHandler: handeCode(code:))
+        self.scanner = Scanner(viewController: self, view: view, codeOutputHandler: onBarcodeDetected)
         guard let scanner = scanner else {
             #if DEBUG
             print("Can't create scanner")
@@ -49,15 +53,10 @@ private extension ViewController {
         
         scanner.requestCaptureSessionStartRunning()
     }
-    
-    private func handeCode(code: String) {
-        print(code)
-    }
-    
 }
 
 // MARK: - UI
-private extension ViewController {
+private extension ScannerViewController {
     
     private func setupView() {
         // self
@@ -72,7 +71,7 @@ private extension ViewController {
 }
 
 // MARK: - AVCaptureMetadataOutputObjectsDelegate
-extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
+extension ScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         scanner?.scannerDelegate(output, didOutput: metadataObjects, from: connection)

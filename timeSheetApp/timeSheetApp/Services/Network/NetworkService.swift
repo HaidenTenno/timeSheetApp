@@ -10,10 +10,11 @@ import Foundation
 import Alamofire
 
 protocol NetworkService {
-    
+    func signIn(login: String, password: String)
+    func logout()
 }
 
-final class NetworkServiceImplementation: NetworkService {
+final class NetworkServiceImplementation {
     
     static let shared = NetworkServiceImplementation()
     
@@ -24,6 +25,16 @@ final class NetworkServiceImplementation: NetworkService {
     }
     
     private init() {}
+}
+
+// MARK: NetworkService
+extension NetworkServiceImplementation: NetworkService {
     
-    // MARK: NetworkService
+    func signIn(login: String, password: String) {
+        
+    }
+    
+    func logout() {
+        
+    }
 }

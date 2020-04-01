@@ -10,4 +10,10 @@ import Foundation
 
 enum Config {
     
+    enum UserDefaults {
+        static let token = "TimeSheetAppToken"
+        static let tokenDefault = "none"
+        static let user = "TimeSheetAppUser"
+        static let userDefault = "none"
+    }
 }

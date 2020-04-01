@@ -26,15 +26,51 @@ final class ViewsCoordinator {
 private extension ViewsCoordinator {
     
     // MARK: - Creators
-    private func createMainMenuVC() -> ViewController {
-        let mainMenuVC = ViewController()
+    private func createMainMenuVC() -> MainMenuViewController {
+        let mainMenuVC = MainMenuViewController(onLoginRequired: presentSignInScreen,
+                                                onScanButtonPressed: presentScannerScreen)
         return mainMenuVC
     }
     
+    private func createSignInVC() -> SignInViewController {
+        let signInVC = SignInViewController()
+        return signInVC
+    }
+    
+    private func createScannerVC() -> ScannerViewController {
+        let scannerVC = ScannerViewController { [unowned self] barcodeData in
+            guard let scannerVC = self.navigationController.topViewController as? ScannerViewController else { return }
+            scannerVC.dismiss(animated: true, completion: nil)
+            self.presentTimeSheetScreen(barcodeData: barcodeData)
+        }
+        return scannerVC
+    }
+    
+    private func createTimeSheetScreen(barcodeData: String) -> TimeSheetViewController {
+        let timeSheetVC = TimeSheetViewController(barcodeData: barcodeData)
+        return timeSheetVC
+    }
     
     // MARK: - Presetners
     private func presentMainMenuScreen() {
         let mainMenuVC = createMainMenuVC()
         navigationController.pushViewController(mainMenuVC, animated: true)
+    }
+    
+    private func presentSignInScreen() {
+        let signInVC = createSignInVC()
+        signInVC.modalPresentationStyle = .fullScreen
+        navigationController.present(signInVC, animated: true, completion: nil)
+    }
+    
+    private func presentScannerScreen() {
+        let scannerVC = createScannerVC()
+        scannerVC.modalPresentationStyle = .automatic
+        navigationController.present(scannerVC, animated: true, completion: nil)
+    }
+    
+    private func presentTimeSheetScreen(barcodeData: String) {
+        let timeSheetVC = createTimeSheetScreen(barcodeData: barcodeData)
+        navigationController.pushViewController(timeSheetVC, animated: true)
     }
 }
