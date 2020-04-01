@@ -7,12 +7,17 @@
 //
 
 import UIKit
+import AVFoundation
 import SnapKit
 
 class ViewController: UIViewController {
-
+    
     // UI
     
+    // Services
+    private var scanner: Scanner?
+    
+    // Public
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -24,13 +29,30 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        setupScanner()
     }
-
-
+    
+    
 }
 
 // MARK: - Private
 private extension ViewController {
+    
+    private func setupScanner() {
+        self.scanner = Scanner(viewController: self, view: view, codeOutputHandler: handeCode(code:))
+        guard let scanner = scanner else {
+            #if DEBUG
+            print("Can't create scanner")
+            #endif
+            return
+        }
+        
+        scanner.requestCaptureSessionStartRunning()
+    }
+    
+    private func handeCode(code: String) {
+        print(code)
+    }
     
 }
 
@@ -46,5 +68,13 @@ private extension ViewController {
     
     private func makeConstraints() {
         
+    }
+}
+
+// MARK: - AVCaptureMetadataOutputObjectsDelegate
+extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
+    
+    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        scanner?.scannerDelegate(output, didOutput: metadataObjects, from: connection)
     }
 }
