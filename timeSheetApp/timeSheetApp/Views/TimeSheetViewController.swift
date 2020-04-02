@@ -15,6 +15,7 @@ class TimeSheetViewController: UIViewController {
     private let barcodeData: String
     
     // UI
+    private var barcodeDataLabel: UILabel!
     
     // Services
     
@@ -46,12 +47,23 @@ private extension TimeSheetViewController {
     
     private func setupView() {
         // self
-        view.backgroundColor = UIColor.red
+        view.backgroundColor = Design.Colors.timeSheetBackgroundColor
+        
+        // barcodeDataLabel
+        barcodeDataLabel = UILabel()
+        barcodeDataLabel.font = Design.Fonts.BigHeader.font
+        barcodeDataLabel.textColor = Design.Fonts.BigHeader.color
+        barcodeDataLabel.textAlignment = .center
+        barcodeDataLabel.text = barcodeData
+        view.addSubview(barcodeDataLabel)
         
         makeConstraints()
     }
     
     private func makeConstraints() {
-        
+        // barcodeDataLabel
+        barcodeDataLabel.snp.makeConstraints { make in
+            make.center.equalTo(view.safeAreaLayoutGuide)
+        }
     }
 }

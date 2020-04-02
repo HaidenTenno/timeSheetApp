@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  ScannerViewController.swift
 //  timeSheetApp
 //
 //  Created by Петр Тартынских on 24.03.2020.
@@ -13,6 +13,7 @@ import SnapKit
 class ScannerViewController: UIViewController {
     
     // UI
+    private var barcodeImageView: UIImageView!
     
     // Services
     private var scanner: Scanner?
@@ -32,26 +33,20 @@ class ScannerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
         setupScanner()
+        setupView()
     }
-    
-    
 }
 
 // MARK: - Private
 private extension ScannerViewController {
     
     private func setupScanner() {
-        self.scanner = Scanner(viewController: self, view: view, codeOutputHandler: onBarcodeDetected)
-        guard let scanner = scanner else {
-            #if DEBUG
-            print("Can't create scanner")
-            #endif
-            return
+        self.scanner = Scanner(delegate: self, codeOutputHandler: onBarcodeDetected)
+        scanner?.addAsASublayer(forView: view)
+        scanner?.requestCaptureSessionStartRunning { [unowned self] in
+            self.barcodeImageView.isHidden = false
         }
-        
-        scanner.requestCaptureSessionStartRunning()
     }
 }
 
@@ -59,14 +54,29 @@ private extension ScannerViewController {
 private extension ScannerViewController {
     
     private func setupView() {
+        
         // self
-        view.backgroundColor = UIColor.red
+        view.backgroundColor = Design.Colors.scannerBackgroundColor
+        
+        // barcodeImageView
+        let  barcodeImageConfig = UIImage.SymbolConfiguration(pointSize: 100, weight: .light, scale: .large)
+        let  barcodeImage = UIImage(systemName: Design.ImageNames.barcodeImage)?
+            .withTintColor(Design.Colors.barcodeImageTintColor)
+            .withRenderingMode(.alwaysOriginal)
+            .withConfiguration(barcodeImageConfig)
+        barcodeImageView = UIImageView(image: barcodeImage)
+        barcodeImageView.isHidden = true
+        view.addSubview(barcodeImageView)
         
         makeConstraints()
     }
     
     private func makeConstraints() {
         
+        // barcodeImageView
+        barcodeImageView.snp.makeConstraints { make in
+            make.center.equalTo(view.safeAreaLayoutGuide)
+        }
     }
 }
 

@@ -39,8 +39,8 @@ private extension ViewsCoordinator {
     
     private func createScannerVC() -> ScannerViewController {
         let scannerVC = ScannerViewController { [unowned self] barcodeData in
-            guard let scannerVC = self.navigationController.topViewController as? ScannerViewController else { return }
-            scannerVC.dismiss(animated: true, completion: nil)
+            guard let topVC = self.navigationController.topViewController as? MainMenuViewController else { return }
+            topVC.dismiss(animated: true, completion: nil)
             self.presentTimeSheetScreen(barcodeData: barcodeData)
         }
         return scannerVC

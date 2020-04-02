@@ -12,6 +12,7 @@ import UIKit
 final class Scanner: NSObject {
     
     // Private
+    private var videoPreviewLayer: AVCaptureVideoPreviewLayer?
     private var captureSession: AVCaptureSession?
     private var codeOutputHandler: (_ code: String) -> Void
     
@@ -29,25 +30,28 @@ final class Scanner: NSObject {
     ]
     
     // Public
-    init(viewController: UIViewController, view: UIView, codeOutputHandler: @escaping (String) -> Void) {
+    init(delegate: AVCaptureMetadataOutputObjectsDelegate, codeOutputHandler: @escaping (String) -> Void) {
         self.codeOutputHandler = codeOutputHandler
         
         super.init()
         
-        guard let captureSession = createCaptureSession(for: viewController) else {
+        guard let captureSession = createCaptureSession(delegate: delegate) else {
             #if DEBUG
             print("Can't create capture session")
             #endif
             return
         }
         self.captureSession = captureSession
-        let previewLayer = createPreviewLayer(withCaptureSession: captureSession, view: view)
-        view.layer.addSublayer(previewLayer)
     }
     
-    func requestCaptureSessionStartRunning() {
-        guard let captureSession = captureSession, !captureSession.isRunning else { return }
-        captureSession.startRunning()
+    func requestCaptureSessionStartRunning(completion: @escaping () -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+            guard let captureSession = self.captureSession, !captureSession.isRunning else { return }
+            captureSession.startRunning()
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
     
     func requestCaptureSessionStopRunning() {
@@ -76,36 +80,43 @@ final class Scanner: NSObject {
         
         codeOutputHandler(stringValue)
     }
+    
+    func addAsASublayer(forView view: UIView) {
+        guard let captureSession = captureSession else { return }
+        setupPreviewLayer(forView: view, withCaptureSession: captureSession)
+    }
 }
 
 // MARK: - Private
 private extension Scanner {
     
-    private func createCaptureSession(for viewController: UIViewController) -> AVCaptureSession? {
+    private func createCaptureSession(delegate: AVCaptureMetadataOutputObjectsDelegate) -> AVCaptureSession? {
         let captureSession = AVCaptureSession()
         guard let captureDevice = AVCaptureDevice.default(for: .video) else { return nil }
         
         // Inputs and outputs for to the capture session
         guard let deviceInput = try? AVCaptureDeviceInput(device: captureDevice) else { return nil }
-        let metaDataOutput = AVCaptureMetadataOutput()
-        
         guard captureSession.canAddInput(deviceInput) else { return nil }
         captureSession.addInput(deviceInput)
         
+        let metaDataOutput = AVCaptureMetadataOutput()
         guard captureSession.canAddOutput(metaDataOutput) else { return nil }
         captureSession.addOutput(metaDataOutput)
-        guard let viewController = viewController as? AVCaptureMetadataOutputObjectsDelegate else { return nil }
-        metaDataOutput.setMetadataObjectsDelegate(viewController, queue: DispatchQueue.main)
+        metaDataOutput.setMetadataObjectsDelegate(delegate, queue: DispatchQueue.main)
         metaDataOutput.metadataObjectTypes = metaObjectTypes
         
         return captureSession
     }
     
-    private func createPreviewLayer(withCaptureSession captureSession: AVCaptureSession, view: UIView) -> AVCaptureVideoPreviewLayer {
+    private func setupPreviewLayer(forView view: UIView, withCaptureSession captureSession: AVCaptureSession) {
         let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.frame = view.layer.bounds
-        previewLayer.videoGravity = .resizeAspectFill
         
-        return previewLayer
+        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.connection?.videoOrientation = .portrait
+        previewLayer.frame = view.bounds
+        
+        view.layer.addSublayer(previewLayer)
+        
+        videoPreviewLayer = previewLayer
     }
 }
