@@ -47,7 +47,7 @@ private extension TimeSheetViewController {
     
     private func setupView() {
         // self
-        view.backgroundColor = Design.Colors.timeSheetBackgroundColor
+        view.backgroundColor = Design.Colors.blueColor
         
         // barcodeDataLabel
         barcodeDataLabel = UILabel()

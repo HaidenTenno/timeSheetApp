@@ -56,12 +56,12 @@ private extension ScannerViewController {
     private func setupView() {
         
         // self
-        view.backgroundColor = Design.Colors.scannerBackgroundColor
+        view.backgroundColor = Design.Colors.blackColor
         
         // barcodeImageView
         let  barcodeImageConfig = UIImage.SymbolConfiguration(pointSize: 100, weight: .light, scale: .large)
         let  barcodeImage = UIImage(systemName: Design.ImageNames.barcodeImage)?
-            .withTintColor(Design.Colors.barcodeImageTintColor)
+            .withTintColor(Design.Colors.transparentGreyColor)
             .withRenderingMode(.alwaysOriginal)
             .withConfiguration(barcodeImageConfig)
         barcodeImageView = UIImageView(image: barcodeImage)

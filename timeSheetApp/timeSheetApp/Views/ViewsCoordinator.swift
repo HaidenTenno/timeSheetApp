@@ -33,7 +33,10 @@ private extension ViewsCoordinator {
     }
     
     private func createSignInVC() -> SignInViewController {
-        let signInVC = SignInViewController()
+        let signInVC = SignInViewController { [unowned self] in
+            guard let topVC = self.navigationController.topViewController as? MainMenuViewController else { return }
+            topVC.dismiss(animated: true, completion: nil)
+        }
         return signInVC
     }
     

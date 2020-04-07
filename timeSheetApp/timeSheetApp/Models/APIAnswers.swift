@@ -8,3 +8,12 @@
 
 import Foundation
 
+struct AuthAnswer: Codable {
+    let access_token: String
+    let token_type: String
+    let expires_in: Int
+}
+
+struct LogoutAnswer: Codable {
+    let message: String
+}

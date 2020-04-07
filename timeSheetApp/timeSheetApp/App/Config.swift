@@ -10,6 +10,11 @@ import Foundation
 
 enum Config {
     
+    enum URLs {
+        static let signIn = "https://..."
+        static let logout = "https://..."
+    }
+    
     enum UserDefaults {
         static let token = "TimeSheetAppToken"
         static let tokenDefault = "none"

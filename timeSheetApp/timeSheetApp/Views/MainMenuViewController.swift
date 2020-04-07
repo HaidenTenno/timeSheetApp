@@ -16,6 +16,7 @@ class MainMenuViewController: UIViewController {
     private var logoutButton: UIButton!
     
     // Services
+    private var networkService: NetworkService = NetworkServiceImplementation.shared
     
     // Callbacks
     private let onLoginRequired: () -> Void
@@ -37,7 +38,10 @@ class MainMenuViewController: UIViewController {
         setupView()
     }
     
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        networkService.delegate = self
+    }
 }
 
 // MARK: - Private
@@ -47,8 +51,9 @@ private extension MainMenuViewController {
         onScanButtonPressed()
     }
     
-    @objc private func onLogounButtonTouched() {
-        onLoginRequired()
+    @objc private func onLogoutButtonTouched() {
+        LoadingIndicatorView.show()
+        networkService.logout()
     }
 }
 
@@ -57,19 +62,19 @@ private extension MainMenuViewController {
     
     private func setupView() {
         // self
-        view.backgroundColor = Design.Colors.mainMenuBackgroundColor
+        view.backgroundColor = Design.Colors.greenColor
         
         // scanButton
         scanButton = UIButton(type: .system)
         let  scanButtonImageConfig = UIImage.SymbolConfiguration(pointSize: 100, weight: .light, scale: .large)
         let  scanButtonImage = UIImage(systemName: Design.ImageNames.scanImage)?
-            .withTintColor(Design.Colors.scanImageTintColor)
+            .withTintColor(Design.Colors.greyColor)
             .withRenderingMode(.alwaysOriginal)
             .withConfiguration(scanButtonImageConfig)
         scanButton.setImage(scanButtonImage, for: .normal)
-        scanButton.backgroundColor = Design.Colors.scanImageBackgroundColor
+        scanButton.backgroundColor = Design.Colors.whiteColor
         scanButton.layer.borderWidth = 6
-        scanButton.layer.borderColor = Design.Colors.scanImageTintColor.cgColor
+        scanButton.layer.borderColor = Design.Colors.greyColor.cgColor
         scanButton.layer.cornerRadius = 100
         scanButton.addTarget(self, action: #selector(onScanButtonTouched), for: .touchUpInside)
         view.addSubview(scanButton)
@@ -78,11 +83,11 @@ private extension MainMenuViewController {
         logoutButton = UIButton(type: .system)
         let logoutButtonImageConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .light, scale: .large)
         let logoutButtonImage = UIImage(systemName: Design.ImageNames.logoutImage)?
-            .withTintColor(Design.Colors.logoutImageTintColor)
+            .withTintColor(Design.Colors.greyColor)
             .withRenderingMode(.alwaysOriginal)
             .withConfiguration(logoutButtonImageConfig)
         logoutButton.setImage(logoutButtonImage, for: .normal)
-        logoutButton.addTarget(self, action: #selector(onLogounButtonTouched), for: .touchUpInside)
+        logoutButton.addTarget(self, action: #selector(onLogoutButtonTouched), for: .touchUpInside)
         view.addSubview(logoutButton)
         
         makeConstraints()
@@ -101,6 +106,16 @@ private extension MainMenuViewController {
         logoutButton.snp.makeConstraints { make in
             make.centerX.equalTo(scanButton)
             make.top.equalTo(scanButton.snp.bottom).offset(30)
+        }
+    }
+}
+
+extension MainMenuViewController: NetworkServiceDelegate {
+    
+    func networkServiceDidLogout(_ networkService: NetworkService) {
+        DispatchQueue.main.async { [unowned self] in
+            LoadingIndicatorView.hide()
+            self.onLoginRequired()
         }
     }
 }
