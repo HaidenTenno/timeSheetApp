@@ -12,12 +12,12 @@ import Foundation
 
 extension UserDefaults {
     
-    var user: String? {
+    var email: String? {
         get {
-            return string(forKey: Config.UserDefaults.user)
+            return string(forKey: Config.UserDefaults.email)
         }
         set {
-            set(newValue, forKey: Config.UserDefaults.user)
+            set(newValue, forKey: Config.UserDefaults.email)
         }
     }
     

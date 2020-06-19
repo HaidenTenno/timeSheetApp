@@ -11,14 +11,12 @@ import Foundation
 enum Config {
     
     enum URLs {
-        static let signIn = "https://..."
-        static let logout = "https://..."
+        static let signIn = "http://laratable.educationhost.cloud/api/mobile/auth"
+        static func printTabel(tabelNum: String) -> String { "http://laratable.educationhost.cloud/api/tabels/\(tabelNum)/printed" }
     }
     
     enum UserDefaults {
         static let token = "TimeSheetAppToken"
-        static let tokenDefault = "none"
-        static let user = "TimeSheetAppUser"
-        static let userDefault = "none"
+        static let email = "TimeSheetAppUser"
     }
 }

@@ -13,7 +13,7 @@ class SignInViewController: UIViewController {
     
     // UI
     private var globalStackView: UIStackView!
-    private var loginTextField: UITextField!
+    private var emailTextField: UITextField!
     private var passwordTextField: UITextField!
     private var signInButton: UIButton!
     
@@ -48,9 +48,9 @@ class SignInViewController: UIViewController {
 private extension SignInViewController {
     
     @objc private func onSignInButtonTouched() {
-        guard let login = loginTextField.text, let password = passwordTextField.text else { return }
+        guard let login = emailTextField.text, let password = passwordTextField.text else { return }
         LoadingIndicatorView.show()
-        networkService.signIn(login: login, password: password)
+        networkService.signIn(email: login, password: password)
     }
 }
 
@@ -69,16 +69,17 @@ private extension SignInViewController {
         globalStackView.distribution = .fillEqually
         view.addSubview(globalStackView)
         
-        // loginTextField
-        loginTextField = UITextFieldPadding(top: 0, left: 10, bottom: 0, right: 10)
-        loginTextField.autocorrectionType = .no
-        loginTextField.autocapitalizationType = .none
-        loginTextField.layer.cornerRadius = 20.0
-        loginTextField.layer.borderWidth = 2.0
-        loginTextField.layer.borderColor = Design.Colors.greyColor.cgColor
-        loginTextField.placeholder = "Login"
-        loginTextField.backgroundColor = .white
-        globalStackView.addArrangedSubview(loginTextField)
+        // emailTextField
+        emailTextField = UITextFieldPadding(top: 0, left: 10, bottom: 0, right: 10)
+        emailTextField.autocorrectionType = .no
+        emailTextField.autocapitalizationType = .none
+        emailTextField.layer.cornerRadius = 20.0
+        emailTextField.layer.borderWidth = 2.0
+        emailTextField.layer.borderColor = Design.Colors.greyColor.cgColor
+        emailTextField.placeholder = "Email"
+        emailTextField.backgroundColor = .white
+        emailTextField.textColor = Design.Colors.greyColor
+        globalStackView.addArrangedSubview(emailTextField)
         
         // passwordTextField
         passwordTextField = UITextFieldPadding(top: 0, left: 10, bottom: 0, right: 10)
@@ -90,6 +91,7 @@ private extension SignInViewController {
         passwordTextField.placeholder = "Password"
         passwordTextField.backgroundColor = .white
         passwordTextField.isSecureTextEntry = true
+        passwordTextField.textColor = Design.Colors.greyColor
         globalStackView.addArrangedSubview(passwordTextField)
         
         // signInButton
@@ -117,8 +119,8 @@ private extension SignInViewController {
             make.height.equalTo(200)
         }
         
-        // loginTextField
-        loginTextField.snp.makeConstraints { make in
+        // emailTextField
+        emailTextField.snp.makeConstraints { make in
             make.left.equalTo(globalStackView).offset(50)
             make.right.equalTo(globalStackView).offset(-50)
         }
@@ -127,16 +129,12 @@ private extension SignInViewController {
         passwordTextField.snp.makeConstraints { make in
             make.left.equalTo(globalStackView).offset(50)
             make.right.equalTo(globalStackView).offset(-50)
-            make.height.equalTo(loginTextField)
+            make.height.equalTo(emailTextField)
         }
-        
-//        // signInButton
-//        signInButton.snp.makeConstraints { make in
-//            make.width.equalTo(50)
-//        }
     }
 }
 
+// MARK: - NetworkServiceDelegate
 extension SignInViewController: NetworkServiceDelegate {
     
     func networkServiceDidSignIn(_ networkService: NetworkService) {
