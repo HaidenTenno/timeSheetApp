@@ -52,6 +52,12 @@ private extension SignInViewController {
         LoadingIndicatorView.show()
         networkService.signIn(email: login, password: password)
     }
+    
+    private func onSignInErrorReceived() {
+        let alertController = UIAlertController(title: "Ошибка", message: "Не удалось зайти в систему", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ясно", style: .default))
+        self.present(alertController, animated: true, completion: nil)
+    }
 }
 
 // MARK: - UI
@@ -141,6 +147,13 @@ extension SignInViewController: NetworkServiceDelegate {
         DispatchQueue.main.async { [unowned self] in
             LoadingIndicatorView.hide()
             self.onSignedIn()
+        }
+    }
+    
+    func networkService(_ networkService: NetworkService, failedWith error: NetworkServiceError) {
+        DispatchQueue.main.async { [unowned self] in
+            LoadingIndicatorView.hide()
+            self.onSignInErrorReceived()
         }
     }
 }

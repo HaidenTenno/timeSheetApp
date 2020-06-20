@@ -12,7 +12,7 @@ enum Config {
     
     enum URLs {
         static let signIn = "http://laratable.educationhost.cloud/api/mobile/auth"
-        static func printTabel(tabelNum: String) -> String { "http://laratable.educationhost.cloud/api/tabels/\(tabelNum)/printed" }
+        static func printTabel(tabelNum: Int) -> String { "http://laratable.educationhost.cloud/api/tabels/\(tabelNum)/printed" }
     }
     
     enum UserDefaults {
