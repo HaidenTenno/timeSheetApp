@@ -36,6 +36,7 @@ class SignInViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        setupGesture()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -47,6 +48,11 @@ class SignInViewController: UIViewController {
 // MARK: - Private
 private extension SignInViewController {
     
+    private func setupGesture() {
+        let gesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:)))
+        view.addGestureRecognizer(gesture)
+    }
+        
     @objc private func onSignInButtonTouched() {
         guard let login = emailTextField.text, let password = passwordTextField.text else { return }
         LoadingIndicatorView.show()
@@ -82,9 +88,12 @@ private extension SignInViewController {
         emailTextField.layer.cornerRadius = 20.0
         emailTextField.layer.borderWidth = 2.0
         emailTextField.layer.borderColor = Design.Colors.greyColor.cgColor
-        emailTextField.placeholder = "Email"
         emailTextField.backgroundColor = .white
         emailTextField.textColor = Design.Colors.greyColor
+        emailTextField.attributedPlaceholder = NSAttributedString(string: "Email", attributes: [
+            NSAttributedString.Key.foregroundColor: Design.Colors.transparentGreyColor
+        ])
+        emailTextField.delegate = self
         globalStackView.addArrangedSubview(emailTextField)
         
         // passwordTextField
@@ -94,10 +103,13 @@ private extension SignInViewController {
         passwordTextField.layer.cornerRadius = 20.0
         passwordTextField.layer.borderWidth = 2.0
         passwordTextField.layer.borderColor = Design.Colors.greyColor.cgColor
-        passwordTextField.placeholder = "Password"
         passwordTextField.backgroundColor = .white
         passwordTextField.isSecureTextEntry = true
         passwordTextField.textColor = Design.Colors.greyColor
+        passwordTextField.attributedPlaceholder = NSAttributedString(string: "Password", attributes: [
+            NSAttributedString.Key.foregroundColor: Design.Colors.transparentGreyColor
+        ])
+        passwordTextField.delegate = self
         globalStackView.addArrangedSubview(passwordTextField)
         
         // signInButton
@@ -137,6 +149,15 @@ private extension SignInViewController {
             make.right.equalTo(globalStackView).offset(-50)
             make.height.equalTo(emailTextField)
         }
+    }
+}
+
+// MARK: - UITextFieldDelegate
+extension SignInViewController: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 
