@@ -18,6 +18,7 @@ class TimeSheetViewController: UIViewController {
     private var barcodeDataLabel: UILabel!
     
     // Services
+    private var networkService: NetworkService = NetworkServiceImplementation.shared
     
     // Public
     init(barcodeData: String) {
@@ -34,12 +35,33 @@ class TimeSheetViewController: UIViewController {
         setupView()
     }
     
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        networkService.delegate = self
+        printTabel()
+    }
 }
 
 // MARK: - Private
 private extension TimeSheetViewController {
     
+    private func printTabel() {
+        guard let tabelNum = Int(barcodeData) else { return }
+        LoadingIndicatorView.show()
+        networkService.printTabel(tabelNum: tabelNum)
+    }
+    
+    private func onSuccsessPrint() {
+        let alertController = UIAlertController(title: "Успех", message: "Табель успешно зафиксирован", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ок", style: .default))
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func onFailedPrint() {
+        let alertController = UIAlertController(title: "Ошибка", message: "Не удалось зафиксировать табель", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ок", style: .default))
+        self.present(alertController, animated: true, completion: nil)
+    }
 }
 
 // MARK: - UI
@@ -64,6 +86,24 @@ private extension TimeSheetViewController {
         // barcodeDataLabel
         barcodeDataLabel.snp.makeConstraints { make in
             make.center.equalTo(view.safeAreaLayoutGuide)
+        }
+    }
+}
+
+// MARK: - NetworkServiceDelegate
+extension TimeSheetViewController: NetworkServiceDelegate {
+    
+    func networkServiceDidPrintTabel(_ networkService: NetworkService) {
+        DispatchQueue.main.async { [unowned self] in
+            LoadingIndicatorView.hide()
+            self.onSuccsessPrint()
+        }
+    }
+    
+    func networkService(_ networkService: NetworkService, failedWith error: NetworkServiceError) {
+        DispatchQueue.main.async { [unowned self] in
+            LoadingIndicatorView.hide()
+            self.onFailedPrint()
         }
     }
 }
